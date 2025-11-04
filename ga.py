@@ -130,7 +130,7 @@ if os.path.exists(csv_path):
             mut_r = st.slider(
                 f"Mutation Rate (Trial {i})",
                 min_value=0.01,
-                max_value=0.05,
+                max_value=0.20,
                 value=0.02,    # Within allowed range
                 step=0.01,
                 key=f"mut_{i}"
