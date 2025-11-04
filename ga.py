@@ -11,7 +11,6 @@ def initialize_population(programs, time_slots, pop_size):
     """Create initial random schedules that match number of time slots."""
     population = []
     for _ in range(pop_size):
-        # Each schedule assigns one program to each time slot (allow repeats)
         schedule = [random.choice(programs) for _ in time_slots]
         population.append(schedule)
     return population
@@ -113,49 +112,50 @@ if os.path.exists(csv_path):
         # Trials Section
         st.subheader("⚙️ Run Three Trials with Different Parameters")
 
-        trial_results = []
-        for i in range(1, 4):
-            st.markdown(f"### 🧩 Trial {i}")
-            
-            # Sliders following assignment rules
-            co_r = st.slider(
-                f"Crossover Rate (Trial {i})",
-                min_value=0.0,
-                max_value=0.95,
-                value=0.8,     # Default as required
-                step=0.01,
-                key=f"co_{i}"
-            )
+        trial_results = []  # Store results for summary
 
-            mut_r = st.slider(
-                f"Mutation Rate (Trial {i})",
-                min_value=0.01,
-                max_value=0.20,
-                value=0.20,    # Within allowed range
-                step=0.01,
-                key=f"mut_{i}"
-            )
+        # --------- TRIAL 1 ----------
+        st.markdown("## 🧩 Trial 1")
+        co_r1 = st.slider("Crossover Rate (Trial 1)", 0.0, 0.95, 0.8, 0.01, key="co1")
+        mut_r1 = st.slider("Mutation Rate (Trial 1)", 0.01, 0.05, 0.02, 0.01, key="mut1")
 
-            run = st.button(f"Run Trial {i}", key=f"run_{i}")
+        if st.button("Run Trial 1"):
+            schedule1, score1 = genetic_algorithm(programs, rating_matrix, pop_size, co_r1, mut_r1, generations)
+            result_df1 = pd.DataFrame({"Time Slot": time_slots, "Program": schedule1})
+            st.success(f"✅ Trial 1 Completed - CO_R={co_r1}, MUT_R={mut_r1}")
+            st.table(result_df1)
+            st.write(f"**Total Fitness (Sum of Ratings): {score1:.2f}**")
+            trial_results.append((1, co_r1, mut_r1, score1, schedule1))
 
-            if run:
-                schedule, score = genetic_algorithm(programs, rating_matrix, pop_size, co_r, mut_r, generations)
+        # --------- TRIAL 2 ----------
+        st.markdown("## 🧩 Trial 2")
+        co_r2 = st.slider("Crossover Rate (Trial 2)", 0.0, 0.95, 0.9, 0.01, key="co2")
+        mut_r2 = st.slider("Mutation Rate (Trial 2)", 0.01, 0.05, 0.03, 0.01, key="mut2")
 
-                # Display the resulting schedule
-                result_df = pd.DataFrame({
-                    "Time Slot": time_slots,
-                    "Program": schedule
-                })
+        if st.button("Run Trial 2"):
+            schedule2, score2 = genetic_algorithm(programs, rating_matrix, pop_size, co_r2, mut_r2, generations)
+            result_df2 = pd.DataFrame({"Time Slot": time_slots, "Program": schedule2})
+            st.success(f"✅ Trial 2 Completed - CO_R={co_r2}, MUT_R={mut_r2}")
+            st.table(result_df2)
+            st.write(f"**Total Fitness (Sum of Ratings): {score2:.2f}**")
+            trial_results.append((2, co_r2, mut_r2, score2, schedule2))
 
-                st.write(f"**Trial {i} Parameters:** CO_R = {co_r}, MUT_R = {mut_r}")
-                st.table(result_df)
-                st.write(f"**Total Fitness (Sum of Ratings): {score:.2f}**")
+        # --------- TRIAL 3 ----------
+        st.markdown("## 🧩 Trial 3")
+        co_r3 = st.slider("Crossover Rate (Trial 3)", 0.0, 0.95, 0.6, 0.01, key="co3")
+        mut_r3 = st.slider("Mutation Rate (Trial 3)", 0.01, 0.05, 0.01, 0.01, key="mut3")
 
-                trial_results.append((i, co_r, mut_r, score, schedule))
+        if st.button("Run Trial 3"):
+            schedule3, score3 = genetic_algorithm(programs, rating_matrix, pop_size, co_r3, mut_r3, generations)
+            result_df3 = pd.DataFrame({"Time Slot": time_slots, "Program": schedule3})
+            st.success(f"✅ Trial 3 Completed - CO_R={co_r3}, MUT_R={mut_r3}")
+            st.table(result_df3)
+            st.write(f"**Total Fitness (Sum of Ratings): {score3:.2f}**")
+            trial_results.append((3, co_r3, mut_r3, score3, schedule3))
 
-        # Display summary of all trials
-        if trial_results:
-            st.subheader("📊 Summary of All Trials")
+        # --------- SUMMARY ----------
+        if len(trial_results) > 0:
+            st.markdown("## 📊 Summary of All Trials")
             summary_df = pd.DataFrame(
                 trial_results,
                 columns=["Trial", "CO_R", "MUT_R", "Fitness", "Best Schedule"]
@@ -164,6 +164,4 @@ if os.path.exists(csv_path):
 
 else:
     st.error("❌ Could not find 'program_ratings_modify.csv'. Please make sure it’s in the same folder as this app.")
-
-
 
