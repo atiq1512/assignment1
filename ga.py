@@ -112,7 +112,7 @@ trial_results = []
 # ===== Trial 1 =====
 st.markdown("## 🧩 Trial 1")
 CO_R1 = st.slider("Crossover Rate (Trial 1)", 0.0, 0.95, 0.8, 0.01, key="co1")
-MUT_R1 = st.slider("Mutation Rate (Trial 1)", 0.01, 0.05, 0.02, 0.01, key="mut1")
+MUT_R1 = st.slider("Mutation Rate (Trial 1)", 0.01, 0.20, 0.20, 0.01, key="mut1")
 if st.button("Run Trial 1"):
     best1, fit1 = genetic_algorithm(df, CO_R1, MUT_R1)
     df1 = pd.DataFrame({"Hour": hours, "Program": best1})
