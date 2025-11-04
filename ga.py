@@ -11,7 +11,8 @@ def initialize_population(programs, time_slots, pop_size):
     """Create initial random schedules that match number of time slots."""
     population = []
     for _ in range(pop_size):
-        schedule = [random.choice(programs) for _ in time_slots]  # allow repeats
+        # Each schedule assigns one program to each time slot (allow repeats)
+        schedule = [random.choice(programs) for _ in time_slots]
         population.append(schedule)
     return population
 
@@ -81,10 +82,10 @@ def genetic_algorithm(programs, ratings, pop_size, co_r, mut_r, generations=100)
 # Streamlit Interface
 # --------------------------------------------------------
 
-st.title("📺 Adaptive Genetic Algorithm for Program Scheduling")
+st.title("📺 Program Scheduling Optimization using Genetic Algorithm")
 st.markdown("""
-This Streamlit app reads your **program_ratings_modify.csv**, detects all programs and time slots,
-and uses a Genetic Algorithm to find the best schedule that maximizes ratings.
+This Streamlit app reads your **program_ratings_modify.csv** file, detects all available programs and time slots, 
+and applies a **Genetic Algorithm (GA)** to find the best schedule that maximizes audience ratings.
 """)
 
 csv_path = "program_ratings_modify.csv"
@@ -99,41 +100,70 @@ if os.path.exists(csv_path):
         st.write(f"**Detected {len(df)} programs and {len(df.columns) - 1} time slots.**")
         st.dataframe(df)
 
+        # Extract programs and ratings
         programs = df["Type of Program"].tolist()
         rating_matrix = df.set_index("Type of Program")
         time_slots = rating_matrix.columns.tolist()
 
-        # Sidebar for GA parameters
+        # Sidebar for GA settings
         st.sidebar.header("Genetic Algorithm Parameters")
         pop_size = st.sidebar.number_input("Population Size", 100, 1000, 300)
         generations = st.sidebar.number_input("Generations", 10, 500, 100)
 
+        # Trials Section
         st.subheader("⚙️ Run Three Trials with Different Parameters")
 
         trial_results = []
         for i in range(1, 4):
             st.markdown(f"### 🧩 Trial {i}")
-            co_r = st.slider(f"Crossover Rate (Trial {i})", 0.0, 0.95, 0.8, 0.01, key=f"co_{i}")
-            mut_r = st.slider(f"Mutation Rate (Trial {i})", 0.01, 0.05, 0.02, 0.2, key=f"mut_{i}")
+            
+            # Sliders following assignment rules
+            co_r = st.slider(
+                f"Crossover Rate (Trial {i})",
+                min_value=0.0,
+                max_value=0.95,
+                value=0.8,     # Default as required
+                step=0.01,
+                key=f"co_{i}"
+            )
+
+            mut_r = st.slider(
+                f"Mutation Rate (Trial {i})",
+                min_value=0.01,
+                max_value=0.05,
+                value=0.02,    # Within allowed range
+                step=0.01,
+                key=f"mut_{i}"
+            )
+
             run = st.button(f"Run Trial {i}", key=f"run_{i}")
 
             if run:
                 schedule, score = genetic_algorithm(programs, rating_matrix, pop_size, co_r, mut_r, generations)
+
+                # Display the resulting schedule
                 result_df = pd.DataFrame({
                     "Time Slot": time_slots,
                     "Program": schedule
                 })
+
                 st.write(f"**Trial {i} Parameters:** CO_R = {co_r}, MUT_R = {mut_r}")
                 st.table(result_df)
                 st.write(f"**Total Fitness (Sum of Ratings): {score:.2f}**")
+
                 trial_results.append((i, co_r, mut_r, score, schedule))
 
+        # Display summary of all trials
         if trial_results:
             st.subheader("📊 Summary of All Trials")
-            summary_df = pd.DataFrame(trial_results, columns=["Trial", "CO_R", "MUT_R", "Fitness", "Best Schedule"])
+            summary_df = pd.DataFrame(
+                trial_results,
+                columns=["Trial", "CO_R", "MUT_R", "Fitness", "Best Schedule"]
+            )
             st.dataframe(summary_df)
 
 else:
-    st.error("❌ Could not find 'program_ratings_modify.csv'. Please ensure it’s in the same folder as this app.")
+    st.error("❌ Could not find 'program_ratings_modify.csv'. Please make sure it’s in the same folder as this app.")
+
 
 
