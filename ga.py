@@ -7,11 +7,11 @@ import os
 # Genetic Algorithm Helper Functions
 # --------------------------------------------------------
 
-def initialize_population(programs, pop_size):
-    """Create initial random schedules."""
+def initialize_population(programs, time_slots, pop_size):
+    """Create initial random schedules that match number of time slots."""
     population = []
     for _ in range(pop_size):
-        schedule = random.sample(programs, len(programs))
+        schedule = [random.choice(programs) for _ in time_slots]  # allow repeats
         population.append(schedule)
     return population
 
@@ -33,23 +33,22 @@ def selection(population, ratings, time_slots):
 def crossover(parent1, parent2):
     """Single-point crossover."""
     point = random.randint(1, len(parent1) - 2)
-    child = parent1[:point] + [p for p in parent2 if p not in parent1[:point]]
+    child = parent1[:point] + parent2[point:]
     return child
 
 
-def mutate(schedule, mut_rate):
-    """Mutate a schedule by swapping programs randomly."""
+def mutate(schedule, mut_rate, programs):
+    """Mutate a schedule by replacing programs randomly."""
     for i in range(len(schedule)):
         if random.random() < mut_rate:
-            j = random.randint(0, len(schedule) - 1)
-            schedule[i], schedule[j] = schedule[j], schedule[i]
+            schedule[i] = random.choice(programs)
     return schedule
 
 
 def genetic_algorithm(programs, ratings, pop_size, co_r, mut_r, generations=100):
     """Run the Genetic Algorithm to optimize scheduling."""
-    time_slots = ratings.columns  # dynamically use whatever hour columns exist
-    population = initialize_population(programs, pop_size)
+    time_slots = ratings.columns
+    population = initialize_population(programs, time_slots, pop_size)
     best_schedule = None
     best_fitness = -1
 
@@ -64,7 +63,7 @@ def genetic_algorithm(programs, ratings, pop_size, co_r, mut_r, generations=100)
                 child = crossover(p1, p2)
             else:
                 child = p1.copy()
-            child = mutate(child, mut_r)
+            child = mutate(child, mut_r, programs)
             next_gen.append(child)
 
         population = next_gen
@@ -84,12 +83,10 @@ def genetic_algorithm(programs, ratings, pop_size, co_r, mut_r, generations=100)
 
 st.title("📺 Adaptive Genetic Algorithm for Program Scheduling")
 st.markdown("""
-This Streamlit app automatically adapts to your **program ratings CSV file**, 
-detecting all programs (rows) and time slots (columns).
-It uses a Genetic Algorithm to find the **best schedule** that maximizes total ratings.
+This Streamlit app reads your **program_ratings_modify.csv**, detects all programs and time slots,
+and uses a Genetic Algorithm to find the best schedule that maximizes ratings.
 """)
 
-# Automatically detect the CSV file
 csv_path = "program_ratings_modify.csv"
 
 if os.path.exists(csv_path):
@@ -102,12 +99,11 @@ if os.path.exists(csv_path):
         st.write(f"**Detected {len(df)} programs and {len(df.columns) - 1} time slots.**")
         st.dataframe(df)
 
-        # Extract programs and time slots dynamically
         programs = df["Type of Program"].tolist()
-        time_slots = [col for col in df.columns if col != "Type of Program"]
         rating_matrix = df.set_index("Type of Program")
+        time_slots = rating_matrix.columns.tolist()
 
-        # Sidebar inputs
+        # Sidebar for GA parameters
         st.sidebar.header("Genetic Algorithm Parameters")
         pop_size = st.sidebar.number_input("Population Size", 100, 1000, 300)
         generations = st.sidebar.number_input("Generations", 10, 500, 100)
@@ -139,4 +135,5 @@ if os.path.exists(csv_path):
 
 else:
     st.error("❌ Could not find 'program_ratings_modify.csv'. Please ensure it’s in the same folder as this app.")
+
 
