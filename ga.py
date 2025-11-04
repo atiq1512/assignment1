@@ -10,11 +10,11 @@ import random
 # ------------------------------------------
 # 1. Load Dataset
 # ------------------------------------------
-st.title("📺 TV Program Scheduling using Genetic Algorithm")
+st.title("Program Scheduling using Genetic Algorithm")
 
 st.markdown("""
-This application uses a *Genetic Algorithm (GA)* to schedule TV programs based on their ratings.  
-You can adjust the *Crossover Rate (CO_R)* and *Mutation Rate (MUT_R)* to observe how they affect each generated schedule.
+This system implements a Genetic Algorithm (GA) approach to generate the most efficient TV program schedule according to rating data.
+By adjusting the Crossover Rate (CO_R) and Mutation Rate (MUT_R), users can analyze how various parameter settings impact the optimization outcome.
 """)
 
 @st.cache_data
@@ -24,7 +24,7 @@ def load_data():
 
 try:
     df = load_data()
-    st.subheader("📊 Program Rating Data (From CSV)")
+    st.subheader("Program Rating Data (From CSV)")
     st.dataframe(df)
 
     programs = df["Type of Program"].tolist()
@@ -106,7 +106,7 @@ def genetic_algorithm(df, CO_R, MUT_R, pop_size=POP_SIZE, generations=GENERATION
 # ------------------------------------------
 # 4. Run 3 Trials Section
 # ------------------------------------------
-st.subheader("⚙️ Run Three Trials with Different Parameters")
+st.subheader("Run Three Trials with Different Parameters")
 trial_results = []
 
 # ===== Trial 1 =====
@@ -144,7 +144,7 @@ if st.button("Run Trial 3"):
 
 # ===== Summary =====
 if len(trial_results) > 0:
-    st.markdown("## 📊 Summary of All Trials")
+    st.markdown("## Summary of All Trials")
     summary = pd.DataFrame(trial_results, columns=["Trial", "CO_R", "MUT_R", "Fitness", "Best Schedule"])
     st.dataframe(summary)
 
