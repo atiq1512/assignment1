@@ -114,7 +114,7 @@ if os.path.exists(csv_path):
         for i in range(1, 4):
             st.markdown(f"### 🧩 Trial {i}")
             co_r = st.slider(f"Crossover Rate (Trial {i})", 0.0, 0.95, 0.8, 0.01, key=f"co_{i}")
-            mut_r = st.slider(f"Mutation Rate (Trial {i})", 0.01, 0.05, 0.02, 0.01, key=f"mut_{i}")
+            mut_r = st.slider(f"Mutation Rate (Trial {i})", 0.01, 0.05, 0.02, 0.2, key=f"mut_{i}")
             run = st.button(f"Run Trial {i}", key=f"run_{i}")
 
             if run:
