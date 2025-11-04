@@ -123,7 +123,7 @@ if st.button("Run Trial 1"):
 # ===== Trial 2 =====
 st.markdown("## 🧩 Trial 2")
 CO_R2 = st.slider("Crossover Rate (Trial 2)", 0.0, 0.95, 0.9, 0.01, key="co2")
-MUT_R2 = st.slider("Mutation Rate (Trial 2)", 0.01, 0.05, 0.03, 0.01, key="mut2")
+MUT_R2 = st.slider("Mutation Rate (Trial 2)", 0.01, 0.20, 0.03, 0.01, key="mut2")
 if st.button("Run Trial 2"):
     best2, fit2 = genetic_algorithm(df, CO_R2, MUT_R2)
     df2 = pd.DataFrame({"Hour": hours, "Program": best2})
@@ -134,7 +134,7 @@ if st.button("Run Trial 2"):
 # ===== Trial 3 =====
 st.markdown("## 🧩 Trial 3")
 CO_R3 = st.slider("Crossover Rate (Trial 3)", 0.0, 0.95, 0.6, 0.01, key="co3")
-MUT_R3 = st.slider("Mutation Rate (Trial 3)", 0.01, 0.05, 0.01, 0.01, key="mut3")
+MUT_R3 = st.slider("Mutation Rate (Trial 3)", 0.01, 0.20, 0.01, 0.01, key="mut3")
 if st.button("Run Trial 3"):
     best3, fit3 = genetic_algorithm(df, CO_R3, MUT_R3)
     df3 = pd.DataFrame({"Hour": hours, "Program": best3})
