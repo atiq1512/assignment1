@@ -149,5 +149,5 @@ if len(trial_results) > 0:
     st.dataframe(summary)
 
     best_trial = max(trial_results, key=lambda x: x[3])
-    st.success(f"🏆 Best Performing Trial: Trial {best_trial[0]} (Fitness: {best_trial[3]:.4f})")
+    st.success(f"🏆 Best Performing Trial: Trial {best_trial[0]} (Fitness: {best_trial[3]:.2f})")
 
